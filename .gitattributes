@@ -1,2 +1,57 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+from contextlib import contextmanager
+import os
+
+
+@contextmanager
+def task(filename, mode="w"):
+    f = open(filename, mode)
+    yield f
+    f.close()
+
+content = 'Dear diary, I can not describe the humiliation, I experienced today.'
+
+def finally_task_1(filename, content):
+    with task(f'{filename}.txt', 'w') as f:
+        f.write(content)
+
+
+finally_task_1('task1', content)
+
+#______________________________________________________________________________________________
+
+class Task:
+    def __init__(self, filename, content):
+        self.filename = filename
+        self.content = content
+
+    def __enter__(self):
+        self.file = open(f'{self.filename}', 'w')
+        return self.file
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        self.file.close()
+
+
+def task1_20(filename, content):
+    with Task(f'{filename}.txt', 'w') as f:
+        f.write(content)
+
+
+task1_20('task1_20', content)
+
+#______________________________________________________________________________________________
+
+@contextmanager
+def task_2(folder_name, *argv):
+    my_path = os.path.join(os.getcwd() + '//' + folder_name)
+    os.mkdir(my_path, 0o666)
+    for i in argv:
+        f = open(f"{my_path + '//' + i}", 'w')
+        f.close()
+
+
+task_2('folder_name', 'file1', 'file2', 'file3', 'file4')
+
+#______________________________________________________________________________________________
+
+    
